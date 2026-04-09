@@ -28,6 +28,12 @@ echo "[+] Probing live domains with httpx-toolkit..."
 cat subfinder_results.txt | httpx-toolkit -sc -td -cl -server -location -cname -title -silent > live_domains.txt
 
 # ----------------------------
+# Taking ScreenShots using aquatone
+# ----------------------------
+
+echo "[+] Taking ScreenShots using aquatone..."
+awk '{print $1}' live_domains.txt | aquatone -silent -out aquatone_output
+# ----------------------------
 # Port scanning
 # ----------------------------
 echo "[+] Running naabu port scan..."
@@ -74,7 +80,7 @@ cat all_urls.txt | gf xss | kxss > possible_xss.txt
 # ----------------------------
 echo "[+] Running SecretFinder..."
 grep -Ei "\.js(\?|$)" all_urls.txt | sort -u | while read -r url; do
-    python3 ~/Tools/SecretFinder.py -i "$url" -o cli >> possible_keys.txt
+    python3 ~/Tools/SecretFinder/SecretFinder.py -i "$url" -o cli >> possible_keys.txt
 done
 
 # ----------------------------
@@ -87,7 +93,7 @@ autofinder -f all_urls.txt
 # Nuclei scanning
 # ----------------------------
 echo "[+] Running nuclei..."
-cat live_domains.txt | awk '{print $1}' | nuclei -severity low,medium,high,critical -o nuclei_results.txt
+cat live_domains.txt | awk '{print $1}' | nuclei -silent -severity low,medium,high,critical -o nuclei_results.txt
 
 # ----------------------------
 # Deactivate virtualenv
@@ -98,4 +104,3 @@ fi
 
 echo "[+] Recon completed!"
 echo "[+] All results saved in: $outdir"
-                                        
